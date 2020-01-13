@@ -1,8 +1,8 @@
-module Jekyll 
+module Jekyll
   module PaginateV2::Generator
 
     #
-    # Static utility functions that are used in the code and 
+    # Static utility functions that are used in the code and
     # don't belong in once place in particular
     #
     class Utils
@@ -43,7 +43,7 @@ module Jekyll
       def self.ensure_leading_dot(path)
         path[0..0] == "." ? path : ".#{path}"
       end
-      
+
       # Static: Return a String version of the input which has a leading slash.
       #         If the input already has a forward slash in position zero, it will be
       #         returned unchanged.
@@ -63,7 +63,7 @@ module Jekyll
       def self.remove_leading_slash(path)
         path[0..0] == "/" ? path[1..-1] : path
       end
-      
+
       # Static: Return a String version of the input which has a trailing slash.
       #         If the input already has a forward slash at the end, it will be
       #         returned unchanged.
@@ -100,9 +100,9 @@ module Jekyll
 
       # Retrieves the given sort field from the given post
       # the sort_field variable can be a hierarchical value on the form "parent_field:child_field" repeated as many times as needed
-      # only the leaf child_field will be retrieved  
+      # only the leaf child_field will be retrieved
       def self.sort_get_post_data(post_data, sort_field)
-        
+
         # Begin by splitting up the sort_field by (;,:.)
         sort_split = sort_field.split(":")
         sort_value = post_data
@@ -170,10 +170,17 @@ module Jekyll
           File.join(dirname, "index#{ext}")
         ]
 
-        return url if valid_values.include?(url)
-        Jekyll.logger.error "Pagination Error:",
-          "Detected invalid url #{url.inspect} for #{template.relative_path.inspect}"
-        Jekyll.logger.abort_with "", "Expected #{valid_values.map(&:inspect).join(' or ')}"
+
+        index_page_url = "/index#{ext}"
+        trailing_index_page_regex = %r!#{Regexp.escape(index_page_url)}\z!
+
+        if valid_values.include?(url)
+          url.sub(trailing_index_page_regex, "/")
+        else
+          Jekyll.logger.error "Pagination Error:",
+            "Detected invalid url #{url.inspect} for #{template.relative_path.inspect}"
+          Jekyll.logger.abort_with "", "Expected #{valid_values.map(&:inspect).join(' or ')}"
+        end
       end
     end
 
